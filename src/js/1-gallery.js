@@ -68,26 +68,24 @@ const images = [
 ];
 
 const gallery = document.querySelector('.gallery');
-const galleryItem = images
-  .map(
-    ({ preview, original, description }) => `
-  <li class="gallery-item">
-    <a class="gallery-link" href="${original}">
-      <img
-        class="gallery-image"
-        src="${preview}"
-        data-source="${original}"
-        alt="${description}"
-      />
+
+function imagesTemplate() {
+  const markup = images
+    .map(el => {
+      return `<li class="gallery-item">
+    <a class="gallery-link" href="${el.original}">
+    <img class="gallery-image" 
+    src="${el.preview}" 
+    alt="${el.description}" />
     </a>
-  </li>
-`
-  )
-  .join('\n');
-
-gallery.innerHTML = galleryItem;
-
-let galleryLightbox = new SimpleLightbox('.gallery a', {
-  captionsData: 'alt',
+    </li>`;
+    })
+    .join('\n');
+  return markup;
+}
+const markup = imagesTemplate();
+gallery.insertAdjacentHTML('afterbegin', markup);
+new SimpleLightbox('.gallery a', {
   captionDelay: 250,
+  captionsData: 'alt',
 });
