@@ -1,37 +1,56 @@
-const feedbackForm = document.querySelector('.feedback-form');
-const emailForm = document.querySelector('[name="email"]');
-const messageForm = document.querySelector('[name="message"]');
+const storagKey = 'feedback-form-state';
 
-feedbackForm.addEventListener('input', event => {
-  const email = emailForm.value;
-  const message = messageForm.value;
+const form = document.querySelector('.feedback-form');
+const textarea = form.querySelector('textarea');
 
-  const myObject = {
-    email: email,
-    message: message,
+form.addEventListener('input', e => {
+  const userName = form.elements.email.value.trim();
+  const userMessage = form.elements.message.value.trim();
+
+  const data = {
+    email: userName,
+    message: userMessage,
   };
-
-  localStorage.setItem('feedback-form-state', JSON.stringify(myObject));
+  saveToLs(storagKey, data);
 });
 
-const savedFeedback = localStorage.getItem('feedback-form-state');
-if (savedFeedback !== null) {
-  const parsedFeedback = JSON.parse(savedFeedback);
-  emailForm.value = parsedFeedback.email;
-  messageForm.value = parsedFeedback.message;
+form.addEventListener('submit', e => {
+  e.preventDefault();
+
+  const userName = form.elements.email.value.trim();
+  const userMessage = form.elements.message.value.trim();
+
+  if (userName === '' || userMessage === '') {
+    alert('Заповніть будь ласка форму');
+    return;
+  }
+
+  const data = loadFromLs(storagKey);
+  console.log(data);
+  form.reset();
+  localStorage.removeItem(storagKey);
+});
+
+function saveToLs(key, value) {
+  const jsonData = JSON.stringify(value);
+  localStorage.setItem(key, jsonData);
 }
 
-feedbackForm.addEventListener('submit', event => {
-  event.preventDefault();
+function loadFromLs(key) {
+  const data = localStorage.getItem(key);
 
-  const submittedEmail = emailForm.value;
-  const submittedMessage = messageForm.value;
+  try {
+    const result = JSON.parse(data);
+    return result;
+  } catch {
+    return data;
+  }
+}
 
-  console.log({
-    email: submittedEmail,
-    message: submittedMessage,
-  });
+function restoreData() {
+  const data = loadFromLs(storagKey) || {};
 
-  emailForm.value = '';
-  messageForm.value = '';
-});
+  form.elements.email.value = (data.email || '').trim();
+  form.elements.message.value = (data.message || '').trim();
+}
+restoreData();
